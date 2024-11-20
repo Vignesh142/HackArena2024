@@ -1,0 +1,7 @@
+groq
+pandas
+sentence-transformers==3.2.1
+faiss-cpu
+langchain-community
+InstructorEmbedding
+flask
