@@ -27,10 +27,19 @@ const FeaturesSection = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-10">
       {features.map((feature, index) => (
-        <div key={index} className="flex flex-col items-center">
-          <img src={feature.image} alt={feature.title} className="rounded-lg mb-4" />
-          <h3 className="font-bold text-lg">{feature.title}</h3>
-          <p className="text-sm text-gray-600">{feature.description}</p>
+        <div
+          key={index}
+          className="flex flex-col items-center gap-3 border-2 border-gray-200 rounded-lg p-4 transition-transform duration-300 transform hover:scale-105 hover:shadow-lg" // Added hover effect and transition
+        >
+          {/* Image with reduced size */}
+          <img
+            src={feature.image}
+            alt={feature.title}
+            className="rounded-lg mb-4"
+            style={{ width: '280px', height: '280px', objectFit: 'cover' }} // Control size directly
+          />
+          <h3 className="font-bold text-lg text-center">{feature.title}</h3>
+          <p className="text-sm text-gray-600 text-center">{feature.description}</p>
         </div>
       ))}
     </div>
