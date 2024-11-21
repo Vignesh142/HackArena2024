@@ -1,0 +1,72 @@
+[
+    {
+      "question": "What type of service did you receive?",
+      "choices": [
+        "Car full service",
+        "Part replacement",
+        "Oil change",
+        "Tire rotation",
+        "Brake inspection",
+        "Other"
+      ]
+    },
+    {
+      "question": "How satisfied are you with the service quality?",
+      "choices": [
+        "Very satisfied",
+        "Satisfied",
+        "Neutral",
+        "Dissatisfied",
+        "Very dissatisfied"
+      ]
+    },
+    {
+      "question": "Did the service center staff meet your expectations for professionalism and courtesy?",
+      "choices": [
+        "Exceeded expectations",
+        "Met expectations",
+        "Below expectations",
+        "Poor"
+      ]
+    },
+    {
+      "question": "How would you rate the cleanliness of your car after service?",
+      "choices": [
+        "Excellent",
+        "Good",
+        "Fair",
+        "Poor"
+      ]
+    },
+    {
+      "question": "How satisfied are you with the quality of the OEM parts used in your recent service?",
+      "choices": [
+        "Very satisfied",
+        "Satisfied",
+        "Neutral",
+        "Dissatisfied",
+        "Very dissatisfied"
+      ]
+    },
+    {
+      "question": "Do you think our OEM parts offer good value for money?",
+      "choices": [
+        "Strongly agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly disagree"
+      ]
+    },
+    {
+      "question": "What improvements would you like to see in our OEM parts?",
+      "choices": [
+        "Better durability",
+        "Improved design",
+        "Enhanced performance",
+        "More color/style options",
+        "Lower cost"
+      ]
+    }
+  ]
+  
