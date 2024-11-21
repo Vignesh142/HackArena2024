@@ -30,24 +30,7 @@ const Header = () => {
         >
           Features
         </a>
-        <a
-          className="text-[#111418] text-sm font-medium hover:text-blue-600 transition duration-300"
-          href="#"
-        >
-          Customers
-        </a>
-        <a
-          className="text-[#111418] text-sm font-medium hover:text-blue-600 transition duration-300"
-          href="#"
-        >
-          Pricing
-        </a>
-        <a
-          className="text-[#111418] text-sm font-medium hover:text-blue-600 transition duration-300"
-          href="#"
-        >
-          Resources
-        </a>
+        
       </nav>
 
       {/* Button Section */}

@@ -14,24 +14,22 @@ const HomePage = () => {
       className="relative flex min-h-screen flex-col bg-slate-50 group/design-root overflow-x-hidden"
       style={{ fontFamily: 'Lexend, "Noto Sans", sans-serif' }}
     >
-      <div className="layout-container flex h-full flex-col gap-"> {/* Added gap between sections */}
-
+      <div className="layout-container flex h-full flex-col gap-6"> {/* Added gap between sections */}
         {/* Header */}
         <Header />
 
         <main className="flex-grow">
-
           {/* Hero Section */}
-          <Hero />
+          <Hero className="mb-6" />  {/* Added margin bottom */}
 
           {/* Features Section */}
-          <FeaturesSection />
+          <FeaturesSection className="mb-6" />  {/* Added margin bottom */}
 
           {/* Additional Sections */}
-          <Solutions />
-          <SubmitTicket />
+          {/* <Solutions /> */}
+          <SubmitTicket className="mb-6" />  {/* Added margin bottom */}
 
-          <FAQs />
+          <FAQs className="mb-6" />  {/* Added margin bottom */}
         </main>
 
         {/* Footer */}
