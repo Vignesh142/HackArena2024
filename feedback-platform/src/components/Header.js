@@ -1,9 +1,11 @@
-import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link for navigation
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // Track if menu is open
+
   return (
-    <header className="flex items-center justify-between px-10 py-3 border-b border-[#f0f2f5] bg-white">
+    <header className="flex items-center justify-between px-6 py-3 border-b border-[#f0f2f5] bg-white">
       {/* Logo Section */}
       <div className="flex items-center gap-4">
         <div className="w-6 h-6 text-[#111418]">
@@ -16,8 +18,8 @@ const Header = () => {
         </h2>
       </div>
 
-      {/* Navigation Links */}
-      <nav className="flex items-center gap-8">
+      {/* Navigation Links (Desktop Only) */}
+      <nav className="hidden md:flex items-center gap-8">
         <Link
           className="text-[#111418] text-sm font-medium hover:text-blue-600 transition duration-300"
           to="/" // Navigate to the home route
@@ -30,7 +32,6 @@ const Header = () => {
         >
           Features
         </a>
-        
       </nav>
 
       {/* Button Section */}
@@ -42,6 +43,36 @@ const Header = () => {
           Sign up
         </button>
       </div>
+
+      {/* Mobile Menu Button */}
+      <div className="md:hidden flex items-center">
+        <button 
+          onClick={() => setIsMenuOpen(!isMenuOpen)} // Toggle menu visibility
+          className="text-[#111418] text-2xl"
+        >
+          <i className="fas fa-bars"></i> {/* Hamburger menu icon */}
+        </button>
+      </div>
+
+      {/* Mobile Navigation Links */}
+      {isMenuOpen && (
+        <div className="md:hidden absolute top-16 left-0 w-full bg-white shadow-lg z-50">
+          <nav className="flex flex-col items-center gap-4 py-4">
+            <Link
+              className="text-[#111418] text-sm font-medium hover:text-blue-600 transition duration-300"
+              to="/" // Navigate to the home route
+            >
+              Home
+            </Link>
+            <a
+              className="text-[#111418] text-sm font-medium hover:text-blue-600 transition duration-300"
+              href="#"
+            >
+              Features
+            </a>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };

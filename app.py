@@ -5,10 +5,10 @@ import json
 import csv
 import uuid
 from bot import answer_customer_query, classify_and_log_query, summarize_and_log_query, sentiment_analysis
-
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app, origins=["http://localhost:3000"])
 @app.route("/faq", methods=["POST"])
 def query():
     try:
@@ -25,7 +25,7 @@ def query():
         return jsonify({"response": response})
     
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": str(e)}), 500g
     
 @app.route("/classify", methods=["POST"])
 def classify():
@@ -159,6 +159,21 @@ def save_feedback():
     except Exception as e:
         print(f'Error writing to CSV: {e}')
         return jsonify({'error': 'Unable to save feedback'}), 500
+    
+# Get Faq Data
+@app.route('/api/getfaq', methods=['GET'])
+def get_faq():
+    faq_path = os.path.join('data', 'faq_data.csv')
+    try:
+        faq_data = []
+        with open(faq_path, 'r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                faq_data.append(row)
+        return jsonify(faq_data)
+    except Exception as e:
+        print(f'Error reading FAQ data file: {e}')
+        return jsonify({'error': 'Unable to load FAQ data'}), 500
 
 @app.route('/form/<form_id>')
 def serve_form(form_id):

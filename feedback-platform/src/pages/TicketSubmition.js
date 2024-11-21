@@ -1,94 +1,100 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Importing the hook for navigation
+import axios from 'axios'; // Axios for API calls
+import Header from '../components/Header';
 
-// Reusable Navigation Button Component
-const NavButton = ({ label, isActive, onClick }) => (
-  <button
-    onClick={onClick}
-    className={`flex items-center gap-3 px-3 py-2 text-sm font-medium leading-normal ${
-      isActive ? 'bg-[#e7eef4] text-[#0d151c]' : 'text-[#0d151c]'
-    }`}
-  >
-    {label}
-  </button>
-);
+const TicketSubmission = () => {
+  const [formData, setFormData] = useState({ name: '', phone: '', query: '' });
 
-const TicketSubmition = () => {
-  const [activeSection, setActiveSection] = useState('overview');
-  const navigate = useNavigate(); // Hook for navigation
+  // Regex for validating Indian phone numbers
+  const phoneRegex = /^[6-9]\d{9}$/;
 
-  const sections = {
-    overview: 'Overview content goes here...',
-    settings: 'Settings content goes here...',
-    fields: 'Fields content goes here...',
+  const handleInputChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
   };
 
-  // Handler for "Submit Ticket" button
-  const handleSubmitTicket = () => {
-    navigate('/submit-ticket'); // Navigates to the "/submit-ticket" route
+  const validateForm = () => {
+    const { name, phone, query } = formData;
+    if (!name || !phone || !query) {
+      alert('Please fill out all fields.');
+      return false;
+    }
+    if (!phoneRegex.test(phone)) {
+      alert('Please enter a valid 10-digit Indian mobile number.');
+      return false;
+    }
+    return true;
+  };
+
+  const submitForm = async () => {
+    if (!validateForm()) return;
+
+    try {
+      const response = await axios.post('http://localhost:5000/submit-ticket', formData);
+      if (response.status === 200) {
+        alert('Data sent successfully!');
+      }
+    } catch (error) {
+      alert('Failed to send data. Please try again.');
+    }
   };
 
   return (
-    <div className="relative flex min-h-screen bg-slate-50 overflow-x-hidden">
-      <div className="flex flex-row w-full">
-        {/* Sidebar on the left */}
-        <div className="w-1/4 bg-slate-100 p-4">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              {/* Navigation Buttons */}
-              {['overview', 'settings', 'fields'].map((section) => (
-                <NavButton
-                  key={section}
-                  label={section.charAt(0).toUpperCase() + section.slice(1)}
-                  isActive={activeSection === section}
-                  onClick={() => setActiveSection(section)}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex flex-1 flex-col p-4">
-          <div className="flex flex-wrap justify-between gap-3 p-4">
-            <p className="text-[#0d151c] tracking-light text-[32px] font-bold leading-tight min-w-72">
-              Submit ticket form
-            </p>
-          </div>
-
-          {/* Conditional Rendering Based on Active Section */}
-          <div className="p-4">{sections[activeSection]}</div>
-
-          <div className="flex items-center gap-4 bg-slate-50 px-4 min-h-14 justify-between">
-            <p className="text-[#0d151c] text-base font-normal leading-normal flex-1 truncate">
-              Require authentication
-            </p>
-            <div className="shrink-0">
-              <label className="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-[#e7eef4] p-0.5 has-[:checked]:justify-end has-[:checked]:bg-[#2094f3]">
-                <div className="h-full w-[27px] rounded-full bg-white"></div>
-                <input type="checkbox" className="invisible absolute" />
+    <div>
+      <Header />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
+            Submit Ticket
+          </h2>
+          <div className="space-y-4">
+            {/* Name Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Name
               </label>
+              <input
+                type="text"
+                placeholder="Enter your name..."
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                className="w-full border-gray-300 rounded-lg shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            {/* Phone Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone
+              </label>
+              <input
+                type="text"
+                placeholder="Enter your 10-digit mobile number..."
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                className="w-full border-gray-300 rounded-lg shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            {/* Query Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Query
+              </label>
+              <textarea
+                placeholder="Enter your query..."
+                value={formData.query}
+                onChange={(e) => handleInputChange('query', e.target.value)}
+                className="w-full border-gray-300 rounded-lg shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500"
+                rows={3}
+              />
             </div>
           </div>
 
-          {/* Form Fields */}
-          {['Name', 'Email', 'Phone'].map((field) => (
-            <div key={field} className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label className="flex flex-col min-w-40 flex-1">
-                <p className="text-[#0d151c] text-base font-medium leading-normal pb-2">{field}</p>
-                <input
-                  className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d151c] focus:outline-0 focus:ring-0 border-none bg-[#e7eef4] focus:border-none h-14 placeholder:text-[#49779c] p-4 text-base font-normal leading-normal"
-                  value=""
-                />
-              </label>
-            </div>
-          ))}
-
-          {/* Submit Button that Navigates to /submit-ticket */}
-          <div className="flex justify-center py-4">
+          {/* Submit Button */}
+          <div className="mt-6">
             <button
-              onClick={handleSubmitTicket} // Trigger navigation on button click
-              className="bg-blue-500 text-white px-6 py-2 rounded-full"
+              onClick={submitForm}
+              className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:ring-4 focus:ring-blue-300"
             >
               Submit Ticket
             </button>
@@ -99,4 +105,4 @@ const TicketSubmition = () => {
   );
 };
 
-export default TicketSubmition;
+export default TicketSubmission;
