@@ -11,11 +11,11 @@ const formatDate = (date) => {
 
 const TicketPage = () => {
   const [tickets, setTickets] = useState([]);
-  const [selectedTicket, setSelectedTicket] = useState(null); // Store selected ticket for popup
-  const [answer, setAnswer] = useState(""); // Store answer for the ticket
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [answer, setAnswer] = useState("");
 
   // Search states
-  const [searchCategory, setSearchCategory] = useState(""); // State for category search
+  const [searchCategory, setSearchCategory] = useState("");
 
   // Fetch tickets from API
   useEffect(() => {
@@ -25,7 +25,6 @@ const TicketPage = () => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
         const data = await response.json();
         setTickets(data);
       } catch (error) {
@@ -36,7 +35,6 @@ const TicketPage = () => {
     fetchTickets();
   }, []);
 
-  // Handle ticket answer submission
   const handleSubmitAnswer = async () => {
     if (!answer.trim()) {
       alert("Answer cannot be empty.");
@@ -44,13 +42,11 @@ const TicketPage = () => {
     }
 
     try {
-      // Prepare the payload
       const payload = {
-        id: selectedTicket.ID, // Use the correct property for ID
+        id: selectedTicket.ID,
         answer: answer.trim(),
       };
 
-      // Send POST request to the backend
       const response = await fetch("http://localhost:8000/api/updateanswer", {
         method: "POST",
         headers: {
@@ -63,7 +59,6 @@ const TicketPage = () => {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      // Update the ticket locally after successful update
       setTickets((prevTickets) =>
         prevTickets.map((ticket) =>
           ticket.ID === selectedTicket.ID
@@ -72,7 +67,6 @@ const TicketPage = () => {
         )
       );
 
-      // Reset states and close modal
       setSelectedTicket(null);
       setAnswer("");
 
@@ -83,77 +77,56 @@ const TicketPage = () => {
     }
   };
 
-  // Filter tickets based on category search
-  const filteredTickets = tickets
-    .filter((ticket) => {
-      const categoryMatch = searchCategory
-        ? ticket.Category.toLowerCase().includes(searchCategory.toLowerCase())
-        : true;
-      return categoryMatch;
-    })
-    .sort((a, b) => formatDate(a.raisedDate) - formatDate(b.raisedDate)); // Sorting by date
+  const filteredTickets = tickets.filter((ticket) => {
+    const categoryMatch = searchCategory
+      ? ticket.Category.toLowerCase().includes(searchCategory.toLowerCase())
+      : true;
+    return categoryMatch;
+  });
 
   return (
-    <div className="flex h-screen">
-      {/* Main Content (no sidebar) */}
-      <div className="flex-1 p-6 bg-gray-100 relative">
-        <h1 className="text-2xl font-bold mb-6">Ticket Queries</h1>
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      <header className="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-6">
+        <h1 className="text-3xl font-bold">Ticket Queries</h1>
+        <p className="text-sm mt-2">Manage and resolve customer queries efficiently</p>
+      </header>
 
-        {/* Search Filters (Category only) */}
-        <div className="mb-6 flex gap-4">
-          <div>
-            <label htmlFor="category" className="block text-sm font-semibold">
-              Category
-            </label>
-            <input
-              id="category"
-              type="text"
-              value={searchCategory}
-              onChange={(e) => setSearchCategory(e.target.value)} // Handle category input
-              className="p-2 border rounded w-full"
-              placeholder="Search by Category"
-            />
-          </div>
+      <main className="flex-1 p-6">
+        {/* Search Filters */}
+        <div className="mb-6">
+          <input
+            type="text"
+            value={searchCategory}
+            onChange={(e) => setSearchCategory(e.target.value)}
+            placeholder="Search by category..."
+            className="w-full max-w-md p-2 border rounded shadow focus:ring focus:ring-blue-300"
+          />
         </div>
 
-        {/* Table Structure */}
+        {/* Table */}
         <div className="overflow-x-auto">
-          <table className="min-w-full border-collapse border border-gray-300 text-sm">
+          <table className="min-w-full border border-gray-300 bg-white rounded shadow">
             <thead className="bg-blue-600 text-white">
               <tr>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Category
-                </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Username
-                </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Mobile Number
-                </th>
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                  Status
-                </th>
+                <th className="p-4">Category</th>
+                <th className="p-4">Username</th>
+                <th className="p-4">Mobile Number</th>
+                <th className="p-4">Status</th>
               </tr>
             </thead>
             <tbody>
               {filteredTickets.map((ticket, index) => (
                 <tr
                   key={index}
-                  className="odd:bg-gray-100 even:bg-gray-50 hover:bg-gray-200 cursor-pointer transition"
-                  onClick={() => setSelectedTicket(ticket)} // Open modal with selected ticket
+                  className="hover:bg-blue-100 transition cursor-pointer"
+                  onClick={() => setSelectedTicket(ticket)}
                 >
-                  <td className="border border-gray-300 px-4 py-2">
-                    {ticket.Category}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {ticket.Username}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {ticket["Mobile Number"]}
-                  </td>
+                  <td className="p-4">{ticket.Category}</td>
+                  <td className="p-4">{ticket.Username}</td>
+                  <td className="p-4">{ticket["Mobile Number"]}</td>
                   <td
-                    className={`border border-gray-300 px-4 py-2 font-semibold ${
-                      !ticket.Answer ? "text-green-600" : "text-red-600"
+                    className={`p-4 font-semibold ${
+                      ticket.Answer ? "text-red-500" : "text-green-500"
                     }`}
                   >
                     {ticket.Answer ? "Closed" : "Open"}
@@ -163,72 +136,66 @@ const TicketPage = () => {
             </tbody>
           </table>
         </div>
+      </main>
 
-        {/* Modal Popup */}
-        {selectedTicket && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded shadow-md w-1/3">
-              <h2 className="text-xl font-bold mb-4">Ticket Details</h2>
-              <p className="mb-2">
-                <strong>Query:</strong> {selectedTicket.Query}
-              </p>
-              <p className="mb-4">
-                <strong>Summary:</strong> {selectedTicket.Summary}
-              </p>
-              <p className="mb-4">
-                <strong>Username:</strong> {selectedTicket.Username}
-              </p>
+      {/* Modal */}
+      {selectedTicket && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96 transform scale-100 transition duration-300">
+            <h2 className="text-xl font-bold mb-4">Ticket Details</h2>
+            <p className="mb-2">
+              <strong>Query:</strong> {selectedTicket.Query}
+            </p>
+            <p className="mb-2">
+              <strong>Summary:</strong> {selectedTicket.Summary}
+            </p>
+            <p className="mb-2">
+              <strong>Username:</strong> {selectedTicket.Username}
+            </p>
 
-              {/* Conditional rendering based on Answer status */}
-              {!selectedTicket.Answer ? (
-                // Open ticket: Show text field for answering
-                <>
-                  <textarea
-                    value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
-                    placeholder="Write your answer here..."
-                    rows="4"
-                    className="w-full p-2 border rounded mb-4"
-                  />
-                  <button
-                    onClick={handleSubmitAnswer}
-                    className="bg-blue-500 text-white py-2 px-4 rounded mr-2"
-                  >
-                    Submit Answer
-                  </button>
-                </>
-              ) : (
-                // Closed ticket: Show existing answer and allow editing
-                <>
-                  <p className="mb-4">
-                    <strong>Answer:</strong> {selectedTicket.Answer}
-                  </p>
-                  <textarea
-                    value={answer || selectedTicket.Answer} // Populate existing answer
-                    onChange={(e) => setAnswer(e.target.value)}
-                    rows="4"
-                    className="w-full p-2 border rounded mb-4"
-                  />
-                  <button
-                    onClick={handleSubmitAnswer}
-                    className="bg-blue-500 text-white py-2 px-4 rounded mr-2"
-                  >
-                    Update Answer
-                  </button>
-                </>
-              )}
+            {!selectedTicket.Answer ? (
+              <>
+                <textarea
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  placeholder="Write your answer..."
+                  className="w-full p-2 border rounded mb-4"
+                ></textarea>
+                <button
+                  onClick={handleSubmitAnswer}
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+                >
+                  Submit Answer
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="mb-4">
+                  <strong>Answer:</strong> {selectedTicket.Answer}
+                </p>
+                <textarea
+                  value={answer || selectedTicket.Answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  className="w-full p-2 border rounded mb-4"
+                ></textarea>
+                <button
+                  onClick={handleSubmitAnswer}
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+                >
+                  Update Answer
+                </button>
+              </>
+            )}
 
-              {/* Close Modal Button */}
-              <button
-                onClick={() => setSelectedTicket(null)}
-                className="bg-gray-300 text-gray-700 py-2 px-4 rounded"
-              >
-                Close
-              </button>
-            </div>
+            <button
+              onClick={() => setSelectedTicket(null)}
+              className="mt-4 bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition"
+            >
+              Close
+            </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

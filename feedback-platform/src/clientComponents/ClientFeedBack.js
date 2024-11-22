@@ -10,8 +10,8 @@ const BadReviews = () => {
   useEffect(() => {
     const fetchBadReviews = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/bad-reviews");
-        setBadReviews(response.data.bad_reviews || []); // Ensure we handle the key properly
+        const response = await axios.get("http://localhost:8000/api/badreviews");
+        setBadReviews(response.data || []); // Directly set the nested array from the API response
       } catch (err) {
         setError("Error fetching bad reviews. Please try again.");
       } finally {
@@ -24,43 +24,55 @@ const BadReviews = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-lg text-blue-500">Loading bad reviews...</div>
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <div className="text-lg font-semibold text-blue-600 animate-pulse">
+          Loading bad reviews...
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-screen bg-gray-100">
         <div className="text-lg text-red-500">{error}</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-200 py-10 px-4">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Bad Reviews</h1>
+        <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">
+          Bad Reviews
+        </h1>
         {badReviews.length === 0 ? (
           <div className="text-center text-gray-600">
             <p>No bad reviews found.</p>
           </div>
         ) : (
-          <div className="bg-white shadow rounded-lg">
+          <div className="bg-white shadow-lg rounded-lg overflow-hidden">
             <ul className="divide-y divide-gray-200">
-              {badReviews.map((review, index) => (
-                <li key={index} className="p-4 hover:bg-gray-50">
-                  <div className="flex items-center">
-                    <div className="text-sm font-medium text-gray-800 flex-grow">
-                      {review}
-                    </div>
-                    <div className="ml-4">
-                      <span className="px-3 py-1 text-xs font-semibold text-red-700 bg-red-100 rounded-full">
-                        Bad Review
-                      </span>
-                    </div>
+              {badReviews.map((reviewArray, index) => (
+                <li
+                  key={index}
+                  className="p-6 hover:bg-gray-100 transition-all duration-300 group"
+                >
+                  {/* Main Heading */}
+                  <div className="text-center text-lg font-semibold text-blue-800 mb-4 group-hover:text-blue-600">
+                    {reviewArray[0]} {/* Display the first element */}
                   </div>
+                  {/* Numbered List */}
+                  <ol className="list-decimal list-inside space-y-2">
+                    {reviewArray.slice(1).map((item, subIndex) => (
+                      <li
+                        key={subIndex}
+                        className="text-sm text-gray-700 group-hover:text-gray-900 transition duration-300"
+                      >
+                        {item}
+                      </li>
+                    ))}
+                  </ol>
                 </li>
               ))}
             </ul>

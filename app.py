@@ -22,62 +22,40 @@ app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000"])
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
-def get_bad_reviews():
+@app.route("/api/badreviews", methods=["GET"])
+def get_bad_review():
     """
-    This endpoint fetches data from feedback.csv, sends it to Groq for classification,
-    and returns only the bad reviews.
+    Endpoint to retrieve the second column values from the CSV file.
     """
-    import os
-    import csv
-    from flask import jsonify
-
-    file_path = "../data/feedback.csv"
-
-    # Check if the file exists
+    file_path = "./data/feedback.csv"
     if not os.path.exists(file_path):
-        return jsonify({"error": f"File not found at: {file_path}"}), 404
-
+        return jsonify({"error": "File feedback.csv not found"}), 404
+    second_column_values = []
+    with open(file_path, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        next(reader)  # Skip the header row
+        for row in reader:
+            if len(row) > 1: 
+                if row[1].strip()=="Very dissatisfied" or row[1].strip()=="Dissatisfied":
+                    second_column_values.append(row)
+    return second_column_values
+    
+def get_bad_review_values(file_path):
+    """
+    Reads the CSV file and extracts values from the second column of each row.
+    """
     try:
-        # Read data from the CSV file
-        reviews = []
-        with open(file_path, "r", encoding="utf-8") as csvfile:
-            reader = csv.DictReader(csvfile)
-            print("Headers:", reader.fieldnames)  # Debug header info
+        second_column_values = []
+        with open(file_path, 'r') as csvfile:
+            reader = csv.reader(csvfile)
+            next(reader)  # Skip the header row
             for row in reader:
-                reviews.append(row)
-
-        # If no reviews were found
-        if not reviews:
-            return jsonify({"error": "No data found in feedback.csv"}), 400
-
-        # Prepare data for classification
-        bad_reviews = []
-        client = Groq(api_key="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")
-        for review in reviews:
-            query = review.get("answer", "").strip()
-            if query:  # Ensure the review text is not empty
-                # Send query to Groq for sentiment classification
-                instruction = (
-                    "Classify this review as 'Positive', 'Neutral', or 'Negative'. "
-                    "Only respond with the classification."
-                )
-                response = client.chat.completions.create(
-                    model="llama-3.1-8b-instant",
-                    messages=[
-                        {"role": "system", "content": instruction},
-                        {"role": "user", "content": query},
-                    ],
-                )
-                classification = response.choices[0].message.content.strip()
-
-                # If classified as Negative, add to bad_reviews
-                if classification.lower() == "negative":
-                    bad_reviews.append({"review": query, "classification": classification})
-
-        return jsonify({"bad_reviews": bad_reviews}), 200
-
+                if len(row) > 1: 
+                    if row[1].strip()=="Very dissatisfied" or row[1].strip()=="Dissatisfied":
+                        second_column_values.append(row)
+        return second_column_values
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return {"error": str(e)}
 
 @app.route("/faq", methods=["POST"])
 def query():
@@ -445,6 +423,9 @@ def chat():
             "Give me my query answers only from the vehicle domain. "
             "Do not go out of context and do not answer any query unrelated to vehicles. "
             "If the query is not related to vehicles, return: 'I don't know. I was not trained on it!!'."
+            "give me the ans in neat bullet points "
+            "if the user greets you and you also greet user"
+            "the answer should be less than 30 words"
         )
 
         # Prepare messages for the model
