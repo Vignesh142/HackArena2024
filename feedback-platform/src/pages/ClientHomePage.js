@@ -9,7 +9,7 @@ const ClientHomePage = () => {
   const menuItems = [
     { name: 'Dashboard', id: 'Dashboard' },
     { name: 'Tickets', id: 'Tickets' },
-    // { name: 'FeedBack', id: 'FeedBack' },
+    { name: 'FeedBack', id: 'FeedBack' },
   ];
 
   // Components to render based on selection
@@ -19,8 +19,8 @@ const ClientHomePage = () => {
         return <CDashboard />;
       case 'Tickets':
         return <CTickets />;
-      // case 'FeedBack':
-      //   return <CFeedBack />;
+      case 'FeedBack':
+        return <CFeedBack />;
     }
   };
 
