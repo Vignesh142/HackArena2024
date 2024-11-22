@@ -3,3 +3,4 @@ __pycache__
 .gradio
 ai
 .env
+voice-assistant/.env
