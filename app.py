@@ -1,5 +1,3 @@
-
-
 # app.py
 from flask import Flask, request, jsonify, render_template
 import os
@@ -9,19 +7,70 @@ import uuid
 from bot import answer_customer_query, classify_and_log_query, summarize_and_log_query, sentiment_analysis
 from flask_cors import CORS
 from groq import Groq
-# from chatbot.
+from chatbot.QuickAgent import LanguageModelProcessor, TextToSpeech, get_transcript
+import asyncio
+import threading
 
-# from chatbot import (
-#     LanguageModelProcessor,  # Import your LLM Processor class
-#     TextToSpeech,            # Import TTS class
-#     get_transcript           # Import transcription method
-# )
 
 GROQ_API = "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"
+
+# Initialize global instances
+llm_processor = LanguageModelProcessor()
+tts = TextToSpeech()
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000"])
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+
+@app.route("/api/badreviews", methods=["GET"])
+def get_bad_reviews():
+    """
+    This endpoint fetches data from feedback.csv, sends it to Groq for classification,
+    and returns only the bad reviews.
+    """
+    file_path = "./data/feedback.csv"
+
+    # Check if the file exists
+    if not os.path.exists(file_path):
+        return jsonify({"error": "File feedback.csv not found"}), 404
+
+    try:
+        # Read data from the CSV file
+        reviews = []
+        with open(file_path, "r", encoding="utf-8") as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                reviews.append(row)
+
+        # Prepare data for classification
+        bad_reviews = []
+        client=Groq(api_key="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")
+        for review in reviews:
+            query = review.get("answer", "")
+            if query:  # Ensure the review text is not empty
+                # Send query to Groq for sentiment classification
+                instruction = (
+                    "Classify this review as 'Positive', 'Neutral', or 'Negative'. "
+                    "Only respond with the classification."
+                )
+                response = client.chat.completions.create(
+                    model="llama-3.1-8b-instant",
+                    messages=[
+                        {"role": "system", "content": instruction},
+                        {"role": "user", "content": query},
+                    ],
+                )
+                classification = response.choices[0].message.content.strip()
+
+                # If classified as Negative, add to bad_reviews
+                # if classification.lower() == "negative":
+                bad_reviews.append({"review": query, "classification": classification})
+
+        return jsonify({"bad_reviews": bad_reviews}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/faq", methods=["POST"])
 def query():
     try:
@@ -101,6 +150,71 @@ def sentiment():
         
         return jsonify({"sentiment": sentiment_result})
     
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+# Callback function to handle transcription result
+def transcription_callback(transcript):
+    """
+    This callback handles the transcription results.
+    You can modify it to handle the results in different ways.
+    In this case, it simply prints the transcript.
+    """
+    print(f"Received Transcription: {transcript}")
+    # You can process the transcript further here (e.g., store it in a database)
+
+# API to handle transcription
+@app.route("/api/transcribe", methods=["POST"])
+def transcribe():
+    """
+    Endpoint to handle transcription requests.
+    Assumes microphone input to Deepgram API for live transcription.
+    Starts transcription in a separate thread.
+    """
+    def transcription_thread():
+        # Pass the transcription_callback to get_transcript to handle the response
+        asyncio.run(get_transcript(transcription_callback))
+
+    # Run transcription in a separate thread (non-blocking)
+    thread = threading.Thread(target=transcription_thread)
+    thread.start()
+
+    return jsonify({"message": "Transcription started"}), 200
+
+
+# API to handle LLM response
+@app.route("/api/respond", methods=["POST"])
+def respond():
+    """
+    Endpoint to process user input via LLM.
+    Input: JSON { "text": "<user message>" }
+    Output: JSON { "response": "<LLM response>" }
+    """
+    data = request.get_json()
+    if not data or "text" not in data:
+        return jsonify({"error": "Invalid request"}), 400
+
+    user_message = data["text"]
+    llm_response = llm_processor.process(user_message)
+    return jsonify({"response": llm_response})
+
+
+# API to handle TTS response
+@app.route("/api/tts", methods=["POST"])
+def tts_speak():
+    """
+    Endpoint to convert text to speech and play audio.
+    Input: JSON { "text": "<text to speak>" }
+    Output: JSON { "message": "Audio generated and played" }
+    """
+    data = request.get_json()
+    if not data or "text" not in data:
+        return jsonify({"error": "Invalid request"}), 400
+
+    text_to_speak = data["text"]
+    try:
+        tts.speak(text_to_speak)
+        return jsonify({"message": "Audio generated and played"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

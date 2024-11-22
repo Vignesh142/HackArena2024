@@ -23,6 +23,7 @@ const features = [
     title: "Voice Your Queries",
     description: "Ask questions and get answers from our team of experts.",
     image: voiceQueriesImage,
+    link: "/talkto-us", // Updated link to TalkToUsPage
   },
   {
     title: "FAQ Assistance",
@@ -38,7 +39,7 @@ const FeaturesSection = () => {
   const navigate = useNavigate(); // Use useNavigate for navigation
 
   // Handle the feature click action
-  const handleFeatureClick = async (action) => {
+  const handleFeatureClick = async (action, link) => {
     if (action === 'submit_feedback') {
       setLoading(true);
       setError('');
@@ -56,9 +57,7 @@ const FeaturesSection = () => {
         if (response.ok) {
           // Extract the formId from the URL and navigate to the form page
           const formId = data.url.split('/').pop();
-          // navigate(/form/${formId}); // Use navigate to redirect to the form page
           navigate(`/form/${formId}`); // Correct syntax
-
         } else {
           setError('Error generating the form URL.');
         }
@@ -67,14 +66,16 @@ const FeaturesSection = () => {
       } finally {
         setLoading(false);
       }
+    } else if (link) {
+      // Navigate to the link if it's defined
+      navigate(link);
     }
   };
 
   return (
     <div id="featureSection" className="py-10 bg-gray-50">
-    <>
       <h2 className="text-[#0d151c] text-[24px] sm:text-[28px] font-semibold leading-tight tracking-[-0.015em] px-4 pb-3">
-      Powerful Features
+        Powerful Features
       </h2>
       <h4 className="text-[#0d151c] text-[17px] leading-tight tracking-[-0.015em] px-6 pb-5">
         Engage provides all the tools you need to collect, analyze, and respond to customer feedback in real time.
@@ -85,7 +86,7 @@ const FeaturesSection = () => {
           <div
             key={index}
             className="flex flex-col items-center gap-3 border-2 border-gray-200 rounded-lg p-4 transition-transform duration-300 transform hover:scale-105 hover:shadow-lg"
-            onClick={() => feature.action && handleFeatureClick(feature.action)} // Trigger action if defined
+            onClick={() => handleFeatureClick(feature.action, feature.link)} // Trigger action or navigation
           >
             {/* Image */}
             {feature.link ? (
@@ -114,7 +115,6 @@ const FeaturesSection = () => {
           </div>
         ))}
       </div>
-    </>
     </div>
   );
 };

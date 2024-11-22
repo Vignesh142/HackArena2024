@@ -12,6 +12,7 @@ SUMMARIZATION_API_URL = "http://127.0.0.1:5000/summarize"  # Example API for Tex
 SENTIMENT_ANALYSIS_API_URL = "http://127.0.0.1:5000/sentiment"  # Example API for Sentiment Analysis
 GENERATE_FORM_API_URL = "http://127.0.0.1:8000/api/generateForm"  # Example API for Form Generation
 
+
 # Function to call the FAQ API
 def call_faq_api(query):
     response = requests.post(FAQ_API_URL, json={"query": query, "groq_api_key": GROQ_KEY})

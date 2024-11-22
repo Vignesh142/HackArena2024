@@ -10,7 +10,7 @@ const BadReviews = () => {
   useEffect(() => {
     const fetchBadReviews = async () => {
       try {
-        const response = await axios.get("http://localhost:9000/api/bad-reviews");
+        const response = await axios.get("http://localhost:8000/api/bad-reviews");
         setBadReviews(response.data.bad_reviews || []); // Ensure we handle the key properly
       } catch (err) {
         setError("Error fetching bad reviews. Please try again.");

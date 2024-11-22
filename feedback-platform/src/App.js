@@ -9,7 +9,7 @@ import AuthPage from "./pages/AuthPage"; // Authentication Page Component
 import LoginPage from "./pages/LoginPage"; // Login Page Component
 import ClientHomePage from "./pages/ClientHomePage"; // Client Home Page Component
 import FormPage from "./components/FormPage";
-
+import TalkToUsPage from "./pages/TalkToUsPage";
 
 
 // Importing reusable components
@@ -35,6 +35,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} /> {/* Login Page */}
             <Route path="/chatbot" element={<Chatbot />} />  {/* Full chatbot UI route */}
             <Route path="/form" element={<FormPage />} />
+            <Route path="/talkto-us" element={<TalkToUsPage />} />
           </Routes>
         </div>
 
