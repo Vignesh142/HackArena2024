@@ -22,31 +22,39 @@ app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000"])
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
-@app.route("/api/badreviews", methods=["GET"])
 def get_bad_reviews():
     """
     This endpoint fetches data from feedback.csv, sends it to Groq for classification,
     and returns only the bad reviews.
     """
-    file_path = "./data/feedback.csv"
+    import os
+    import csv
+    from flask import jsonify
+
+    file_path = "../data/feedback.csv"
 
     # Check if the file exists
     if not os.path.exists(file_path):
-        return jsonify({"error": "File feedback.csv not found"}), 404
+        return jsonify({"error": f"File not found at: {file_path}"}), 404
 
     try:
         # Read data from the CSV file
         reviews = []
         with open(file_path, "r", encoding="utf-8") as csvfile:
             reader = csv.DictReader(csvfile)
+            print("Headers:", reader.fieldnames)  # Debug header info
             for row in reader:
                 reviews.append(row)
 
+        # If no reviews were found
+        if not reviews:
+            return jsonify({"error": "No data found in feedback.csv"}), 400
+
         # Prepare data for classification
         bad_reviews = []
-        client=Groq(api_key="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")
+        client = Groq(api_key="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")
         for review in reviews:
-            query = review.get("answer", "")
+            query = review.get("answer", "").strip()
             if query:  # Ensure the review text is not empty
                 # Send query to Groq for sentiment classification
                 instruction = (
@@ -63,8 +71,8 @@ def get_bad_reviews():
                 classification = response.choices[0].message.content.strip()
 
                 # If classified as Negative, add to bad_reviews
-                # if classification.lower() == "negative":
-                bad_reviews.append({"review": query, "classification": classification})
+                if classification.lower() == "negative":
+                    bad_reviews.append({"review": query, "classification": classification})
 
         return jsonify({"bad_reviews": bad_reviews}), 200
 
