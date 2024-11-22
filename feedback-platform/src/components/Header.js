@@ -22,15 +22,21 @@ const Header = () => {
       <nav className="hidden md:flex items-center gap-8">
         <Link
           className="text-[#111418] text-sm font-medium hover:text-blue-600 transition duration-300"
-          to="/" // Navigate to the home route
+          to="#home" // Navigate to the home route
         >
           Home
         </Link>
         <a
           className="text-[#111418] text-sm font-medium hover:text-blue-600 transition duration-300"
-          href="#"
+          href="#featureSection"
         >
           Features
+        </a>
+        <a
+          className="text-[#111418] text-sm font-medium hover:text-blue-600 transition duration-300"
+          href="#ticketSection"
+        >
+          Ticket
         </a>
       </nav>
 

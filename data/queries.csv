@@ -1,2 +1,8 @@
-Query,Category,Summary,Answer
-What is the phone number of customer service?,Sales & Post-Purchase Services,The query asks for the phone number of customer service.,The number is +1234
+ID,Username,Mobile Number,Query,Category,Summary,Answer
+fca2176b-da96-4904-a025-d53fe40c31ed,Naveen,4321,How to turn Hotspot in Mobile? ,Technical Issues & Troubleshooting,Enable mobile hotspot functionality.,Go to setting and search
+eba392ef-b0e4-40bb-86bb-9d396b5d0330,Varun,4321,How to turn Hotspot in Mobile? ,Technical Issues & Troubleshooting,Enable mobile hotspot functionality.,Use Phone settings
+e4f3c5dc-797b-4653-b5b8-ed613b54ee7a,Varun,4321,How to turn Hotspot in Mobile? ,Vehicle Features & Upgrades,Enable mobile hotspot.,
+9da199fe-62e6-4d1c-a08c-09ef223485d7,John Doe,,Sample query,Miscellaneous,Please provide the text you'd like me to summarize.,ok
+370217ea-7d90-4ac9-be69-fe0843256d9f,John Doe,,Sample query,Miscellaneous,"Please provide the text you'd like me to summarize, and I'll give you a one-line summary that captures the main idea.",
+3b569c1c-fb46-4254-83ba-78e8b924bd25,John Doe,,Sample query,Miscellaneous,"Needs more information to summarize, please provide the text.",
+0de243fa-264d-4a57-ac50-97fd8dcc9701,John Doe,,Sample query,Technical Issues & Troubleshooting,"I apologize, but there is no text provided. Please share the text you would like me to summarize, and I'll be happy to help!",

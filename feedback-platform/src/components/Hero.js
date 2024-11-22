@@ -1,5 +1,5 @@
-import React from 'react';
-import HeroImage from '../assets/hero-image.png'; // Adjust the image path accordingly
+import React from "react";
+import HeroImage from "../assets/hero-image.png"; // Adjust the image path accordingly
 
 const HeroSection = () => {
   return (
@@ -9,8 +9,8 @@ const HeroSection = () => {
         <img
           src={HeroImage}
           alt="Customer Service Illustration"
-          className="rounded-lg shadow-md max-w-xs md:max-w-lg h-auto" // Responsive image adjustments
-          loading="lazy" // Lazy load for better performance
+          className="rounded-lg shadow-md max-w-xs md:max-w-lg h-auto"
+          loading="lazy"
         />
       </div>
 
@@ -24,12 +24,13 @@ const HeroSection = () => {
           Engage. Improve your customer experience and drive business
           outcomes.
         </p>
-        <button
+        <a
+          href="#featureSection" // Link to the FeatureSection's id
           className="bg-[#0b6fda] text-white px-6 py-3 rounded-lg font-bold shadow hover:bg-blue-700 transition duration-300"
           aria-label="Get Started"
         >
           Get Started
-        </button>
+        </a>
       </div>
     </div>
   );

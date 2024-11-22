@@ -1,45 +1,42 @@
-import React from 'react';
-import faq1 from '../assets/faq-1.png';
-import faq2 from '../assets/faq-2.png';
-import faq3 from '../assets/faq-3.png';
+// import React from 'react';
+// import { useNavigate } from 'react-router-dom'; // For navigation
+// import faq1 from '../assets/faq-1.png'; // Replace with your image path
 
-// List of FAQs with titles and associated images
-const faqs = [
-  { title: 'What can I do on your platform?', image: faq1 },
-  { title: 'How do I sign up for an account?', image: faq2 },
-  { title: 'How do I reset my password?', image: faq3 },
-];
+// const FAQCard = () => {
+//   const navigate = useNavigate(); // Navigation hook
 
-const FAQs = () => {
-  return (
-    <>
-      {/* Section title */}
-      <h2 className="text-[#0d151c] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-2">
-        FAQs
-      </h2>
+//   // Function to handle redirection
+//   const handleCardClick = () => {
+//     navigate('/faq-details'); // Replace with your desired route
+//   };
 
-      {/* Flexbox layout for a single row */}
-      <div className="flex gap-12 px-12 pb-10 overflow-x-auto">
-        {faqs.map((item, index) => (
-          <div
-            key={index}
-            className="flex flex-col items-center gap-5 border-2 border-gray-200 rounded-lg p-3 min-w-[160px] transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-          >
-            {/* FAQ Image */}
-            <img
-              src={item.image}
-              alt={`FAQ ${index + 1}`}
-              className="w-72 h-72 rounded-md object-cover"
-            />
-            {/* FAQ Title */}
-            <p className="text-[#0d151c] text-sm font-medium leading-normal text-center">
-              {item.title}
-            </p>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-};
+//   return (
+//     <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 px-4">
+//       <div
+//         onClick={handleCardClick}
+//         className="flex flex-col items-center gap-4 p-6 max-w-[300px] border-2 border-indigo-300 bg-white rounded-lg shadow-lg transition-transform transform hover:scale-105 hover:shadow-2xl cursor-pointer"
+//       >
+//         {/* FAQ Image */}
+//         <img
+//           src={faq1}
+//           alt="FAQ Example"
+//           className="w-full h-48 rounded-md object-cover"
+//         />
+//         {/* FAQ Title */}
+//         <h3 className="text-xl font-semibold text-indigo-800 text-center">
+//           What can I do on your platform?
+//         </h3>
+//         {/* Description */}
+//         <p className="text-sm text-gray-600 text-center">
+//           Discover the features and tools available to enhance your experience on our platform.
+//         </p>
+//         {/* Button */}
+//         <button className="mt-4 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+//           Learn More
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };
 
-export default FAQs;
+// export default FAQCard;

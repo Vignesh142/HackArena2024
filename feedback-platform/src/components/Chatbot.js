@@ -1,18 +1,44 @@
 import React, { useState } from "react";
 import { FiMessageCircle, FiSend, FiMic, FiPaperclip, FiX } from "react-icons/fi";
+import axios from "axios";
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleChatbot = () => setIsOpen(!isOpen);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim()) {
-      setMessages([...messages, { type: "user", text: input }]);
+      // Add user message to the chat
+      const userMessage = { type: "user", text: input };
+      setMessages([...messages, userMessage]);
       setInput("");
-      // TODO: Call backend API to send user message and receive bot response
+
+      // Set loading state
+      setIsLoading(true);
+
+      try {
+        // Send the user message to the backend API
+        const response = await axios.post("http://127.0.0.1:8000/api/chat", {
+          user_prompt: input,
+        });
+
+        // Add the bot response to the chat
+        const botMessage = { type: "bot", text: response.data.response };
+        setMessages((prevMessages) => [...prevMessages, botMessage]);
+      } catch (error) {
+        console.error("Error fetching response:", error);
+        const errorMessage = {
+          type: "bot",
+          text: "Oops! Something went wrong. Please try again later.",
+        };
+        setMessages((prevMessages) => [...prevMessages, errorMessage]);
+      } finally {
+        setIsLoading(false); // Stop loading
+      }
     }
   };
 
@@ -57,6 +83,13 @@ const Chatbot = () => {
                 </div>
               </div>
             ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="px-4 py-2 rounded-lg text-sm shadow bg-gray-200 text-gray-800">
+                  Typing...
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Input Bar */}
@@ -77,6 +110,7 @@ const Chatbot = () => {
             <button
               onClick={handleSend}
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+              disabled={isLoading}
             >
               <FiSend />
             </button>

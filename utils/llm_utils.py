@@ -54,7 +54,7 @@ def save_query_and_category(query, category, file_path="query_classification_log
 
 def get_summarization_response(text, api_key, max_tokens=100):
     """Summarizes the input text using the Groq API."""
-    prompt = f"Summarize the following text in one sentence for a quick overview while retaining its main meaning: '{text}'.Don't try to explain the query, just summarize it that evaluator can understand."
+    prompt = f"Summarize the following text in one line for a quick overview while retaining its main meaning: '{text}'.Don't try to explain the query, just summarize it that evaluator can understand. Dont give any text other than summary. Just give summary in plain text without any quotations"
     client = Groq(api_key=api_key)
     # Create a chat completion request for summarization
     chat_completion = client.chat.completions.create(

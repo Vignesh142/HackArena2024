@@ -1,3 +1,5 @@
+
+
 # app.py
 from flask import Flask, request, jsonify, render_template
 import os
@@ -6,9 +8,20 @@ import csv
 import uuid
 from bot import answer_customer_query, classify_and_log_query, summarize_and_log_query, sentiment_analysis
 from flask_cors import CORS
+from groq import Groq
+from chatbot.
+
+from chatbot import (
+    LanguageModelProcessor,  # Import your LLM Processor class
+    TextToSpeech,            # Import TTS class
+    get_transcript           # Import transcription method
+)
+
+GROQ_API = "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"
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000"])
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 @app.route("/faq", methods=["POST"])
 def query():
     try:
@@ -25,7 +38,7 @@ def query():
         return jsonify({"response": response})
     
     except Exception as e:
-        return jsonify({"error": str(e)}), 500g
+        return jsonify({"error": str(e)}), 500
     
 @app.route("/classify", methods=["POST"])
 def classify():
@@ -92,7 +105,7 @@ def sentiment():
         return jsonify({"error": str(e)}), 500
 
 # Quiz Page Code
-PORT = 5000
+PORT = 8000
 form_data_store = {}
 
 @app.route('/api/generateForm', methods=['POST'])
@@ -110,6 +123,54 @@ def generate_form():
         return jsonify({'url': unique_url})
     except Exception as e:
         return jsonify({'error': 'Unable to generate form', 'err': str(e)}), 500
+    
+@app.route("/api/badreviews", methods=["GET"])
+def get_bad_reviews():
+    """
+    This endpoint fetches data from feedback.csv, sends it to Groq for classification,
+    and returns only the bad reviews.
+    """
+    file_path = "./data/feedback.csv"
+
+    # Check if the file exists
+    if not os.path.exists(file_path):
+        return jsonify({"error": "File feedback.csv not found"}), 404
+
+    try:
+        # Read data from the CSV file
+        reviews = []
+        with open(file_path, "r", encoding="utf-8") as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                reviews.append(row)
+
+        # Prepare data for classification
+        bad_reviews = []
+        for review in reviews:
+            query = review.get("answer", "")
+            if query:  # Ensure the review text is not empty
+                # Send query to Groq for sentiment classification
+                instruction = (
+                    "Classify this review as 'Positive', 'Neutral', or 'Negative'. "
+                    "Only respond with the classification."
+                )
+                response = client.chat.completions.create(
+                    model="llama-3.1-8b-instant",
+                    messages=[
+                        {"role": "system", "content": instruction},
+                        {"role": "user", "content": query},
+                    ],
+                )
+                classification = response.choices[0].message.content.strip()
+
+                # If classified as Negative, add to bad_reviews
+                if classification.lower() == "negative":
+                    bad_reviews.append({"review": query, "classification": classification})
+
+        return jsonify({"bad_reviews": bad_reviews}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/questions', methods=['GET'])
 def get_questions():
@@ -121,6 +182,7 @@ def get_questions():
     except Exception as e:
         print(f'Error reading questions file: {e}')
         return jsonify({'error': 'Unable to load questions'}), 500
+
 
 @app.route('/api/feedback', methods=['POST'])
 def save_feedback():
@@ -175,6 +237,110 @@ def get_faq():
         print(f'Error reading FAQ data file: {e}')
         return jsonify({'error': 'Unable to load FAQ data'}), 500
 
+# Save Query Data
+@app.route('/api/savequery', methods=['POST'])
+def save_query():
+    # Get JSON data from the request
+    data = request.get_json()
+    api_key = GROQ_API
+
+    # Extract required fields with defaults if not provided
+    username = data.get('username', '')
+    mobile_no = data.get('mobileNo', '')
+    query = data.get('query', '')
+    answer = ''
+    query_id = str(uuid.uuid4())  # Generate a unique ID for the query
+
+    try:
+        category_result = classify_and_log_query(query, api_key)
+        summary_result = summarize_and_log_query(query, api_key)
+    except Exception as e:
+        print(f'Error processing query: {e}')
+        category_result = ''
+        summary_result = ''
+        answer = ''
+
+    # Define the path to the CSV file
+    file_path = os.path.join('data', 'queries.csv')
+
+    # Check if the file exists
+    file_exists = os.path.isfile(file_path)
+
+    try:
+        # Open the CSV file for appending
+        with open(file_path, mode='a', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+
+            # Write headers if the file doesn't exist
+            if not file_exists or os.stat(file_path).st_size == 0:
+                writer.writerow(['ID', 'Username', 'Mobile Number', 'Query', 'Category', 'Summary', 'Answer'])
+
+            # Write the data row
+            writer.writerow([query_id, username, mobile_no, query, category_result, summary_result, answer])
+
+        return jsonify({'message': 'Query saved successfully!', 'id': query_id}), 200
+    except Exception as e:
+        print(f'Error saving query to CSV: {e}')
+        return jsonify({'error': 'Unable to save query'}), 500
+
+# Fetch all queries API
+@app.route('/api/getqueries', methods=['GET'])
+def get_queries():
+    # Define the path to the CSV file
+    file_path = os.path.join('data', 'queries.csv')
+
+    try:
+        # Open the CSV file for reading
+        with open(file_path, mode='r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            queries = []
+
+            for row in reader:
+                # Handle NoneType values by replacing them with an empty string or a default value
+                cleaned_row = {key: (value if value is not None else '') for key, value in row.items()}
+                queries.append(cleaned_row)
+
+        return jsonify(queries)
+    except Exception as e:
+        print(f'Error reading queries from CSV: {e}')
+        return jsonify({'error': 'Unable to load queries'}), 500
+
+# Update query answer API
+@app.route('/api/updateanswer', methods=['POST'])
+def update_answer():
+    # Get JSON data from the request
+    data = request.get_json()
+    query_id = data.get('id', '')
+    new_answer = data.get('answer', '')
+
+    file_path = os.path.join('data', 'queries.csv')
+    temp_file_path = os.path.join('data', 'queries_temp.csv')
+
+    try:
+        updated = False
+
+        with open(file_path, mode='r', encoding='utf-8') as infile, open(temp_file_path, mode='w', newline='', encoding='utf-8') as outfile:
+            reader = csv.DictReader(infile)
+            writer = csv.DictWriter(outfile, fieldnames=reader.fieldnames)
+
+            writer.writeheader()
+            for row in reader:
+                if row['ID'] == query_id:
+                    row['Answer'] = new_answer
+                    updated = True
+                writer.writerow(row)
+
+        # Replace the original file with the updated file
+        os.replace(temp_file_path, file_path)
+
+        if updated:
+            return jsonify({'message': 'Answer updated successfully!'}), 200
+        else:
+            return jsonify({'error': 'Query ID not found'}), 404
+    except Exception as e:
+        print(f'Error updating answer: {e}')
+        return jsonify({'error': 'Unable to update answer'}), 500
+    
 @app.route('/form/<form_id>')
 def serve_form(form_id):
     print(form_data_store)
@@ -186,10 +352,83 @@ def serve_form(form_id):
             return render_template('form_submitted.html')
     else:
         return jsonify({'error': 'Invalid form ID'}), 404
+    
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    try:
+        # Get the user prompt from the request data
+        data = request.json
+        user_prompt = data.get("user_prompt")
+        client = Groq(api_key="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")
+
+        if not user_prompt:
+            return jsonify({"error": "No user prompt provided!"}), 400
+
+        # Define the instruction to restrict answers to the vehicle domain
+        instruction = (
+            "Give me my query answers only from the vehicle domain. "
+            "Do not go out of context and do not answer any query unrelated to vehicles. "
+            "If the query is not related to vehicles, return: 'I don't know. I was not trained on it!!'."
+        )
+
+        # Prepare messages for the model
+        messages = [
+            {"role": "system", "content": instruction},
+            {"role": "user", "content": user_prompt}
+        ]
+
+        # Send the messages to the LLM'
+       
+        
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",  # Replace with the desired model
+            messages=messages
+        )
+
+        assistant_response = response.choices[0].message.content
+
+        # Return the assistant's response as JSON
+        return jsonify({"response": assistant_response}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/second-column', methods=['GET'])
+def get_second_column():
+    """
+    Endpoint to retrieve the second column values from the CSV file.
+    """
+    file_path = "./data/feedback.csv"
+    if not os.path.exists(file_path):
+        return jsonify({"error": "File feedback.csv not found"}), 404
+    second_column_values = []
+    with open(file_path, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        next(reader)  # Skip the header row
+        for row in reader:
+            if len(row) > 1:
+                second_column_values.append(row[1].strip())
+    return second_column_values
+    
+def get_second_column_values(file_path):
+    """
+    Reads the CSV file and extracts values from the second column of each row.
+    """
+    try:
+        second_column_values = []
+        with open(file_path, 'r') as csvfile:
+            reader = csv.reader(csvfile)
+            next(reader)  # Skip the header row
+            for row in reader:
+                if len(row) > 1:
+                    second_column_values.append(row[1].strip())
+        return second_column_values
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.route('/')
 def home():
     return "Hello!!, Flask Server Running..."
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=8000)

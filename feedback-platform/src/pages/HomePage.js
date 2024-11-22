@@ -4,12 +4,13 @@ import FeaturesSection from '../components/FeaturesSection';
 import Footer from '../components/Footer';
 import HeroImage from '../assets/hero-image.png'; // Make sure the path is correct
 import Solutions from '../components/Solutions';
-import FAQs from '../components/FAQs';
+// import FAQs from '../components/FAQs';
 import SubmitTicket from '../components/SubmitTicket';
 import Hero from '../components/Hero';
 
 const HomePage = () => {
   return (
+    <div id="home" className="py-10 bg-gray-50">
     <div
       className="relative flex min-h-screen flex-col bg-slate-50 group/design-root overflow-x-hidden"
       style={{ fontFamily: 'Lexend, "Noto Sans", sans-serif' }}
@@ -29,12 +30,13 @@ const HomePage = () => {
           {/* <Solutions /> */}
           <SubmitTicket className="mb-6" />  {/* Added margin bottom */}
 
-          <FAQs className="mb-6" />  {/* Added margin bottom */}
+          {/* <FAQs className="mb-6" />  Added margin bottom */}
         </main>
 
         {/* Footer */}
         <Footer />
       </div>
+    </div>
     </div>
   );
 };

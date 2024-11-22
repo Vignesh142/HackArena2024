@@ -1,37 +1,37 @@
 import React from "react";
-//import { signInWithPopup, auth, googleProvider } from "../firebase"; // Import Firebase setup
+// import { signInWithPopup, auth, googleProvider } from "../firebase"; // Uncomment and set up Firebase
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const navigate = useNavigate();
 
-//   const handleGoogleLogin = async () => {
-//     try {
-//       const result = await signInWithPopup(auth, googleProvider);
-//       console.log("User:", result.user);
-//       navigate("/"); // Redirect to HomePage after successful login
-//     } catch (error) {
-//       console.error("Error during Google Sign-In:", error);
-//     }
-//   };
+  // const handleGoogleLogin = async () => {
+  //   try {
+  //     const result = await signInWithPopup(auth, googleProvider);
+  //     console.log("User:", result.user);
+  //     navigate("/"); // Redirect to HomePage after successful login
+  //   } catch (error) {
+  //     console.error("Error during Google Sign-In:", error);
+  //   }
+  // };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-blue-300">
-      <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full">
-        <h1 className="text-2xl font-bold text-gray-800 text-center mb-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-r from-blue-200 via-blue-300 to-blue-400">
+      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
+        <h1 className="mb-6 text-center text-3xl font-bold text-gray-800">
           Welcome to Engage
         </h1>
-        <p className="text-gray-600 text-center mb-6">
+        <p className="mb-8 text-center text-gray-600">
           Log in or Sign up to continue
         </p>
         <button
-         // onClick={handleGoogleLogin}
-          className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center gap-2"
+          // onClick={handleGoogleLogin}
+          className="flex w-full items-center justify-center gap-3 rounded-lg bg-blue-600 py-3 text-white font-medium shadow-md transition duration-300 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 48 48"
-            className="w-6 h-6"
+            className="h-6 w-6"
           >
             <path
               fill="#EA4335"
@@ -50,8 +50,18 @@ const LoginPage = () => {
               d="M3.96 13.51l7.82 6.1C13.4 13.43 18.23 9.5 24 9.5c3.52 0 6.63 1.35 9.04 3.54l6.77-6.78C35.18 2.93 30.03.5 24 .5 14.94.5 7.32 6.08 3.96 13.51z"
             />
           </svg>
-          Log in with Google
+          Continue with Google
         </button>
+        <p className="mt-6 text-center text-sm text-gray-500">
+          By continuing, you agree to our{" "}
+          <a href="#" className="text-blue-500 hover:underline">
+            Terms of Service
+          </a>{" "}
+          and{" "}
+          <a href="#" className="text-blue-500 hover:underline">
+            Privacy Policy
+          </a>.
+        </p>
       </div>
     </div>
   );

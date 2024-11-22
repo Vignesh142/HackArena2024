@@ -10,7 +10,7 @@ FAQ_API_URL = "http://127.0.0.1:5000/faq"  # Example API for FAQ Bot
 CLASSIFICATION_API_URL = "http://127.0.0.1:5000/classify"  # Example API for Text Classification
 SUMMARIZATION_API_URL = "http://127.0.0.1:5000/summarize"  # Example API for Text Summarization
 SENTIMENT_ANALYSIS_API_URL = "http://127.0.0.1:5000/sentiment"  # Example API for Sentiment Analysis
-GENERATE_FORM_API_URL = "http://127.0.0.1:5000/api/generateForm"  # Example API for Form Generation
+GENERATE_FORM_API_URL = "http://127.0.0.1:8000/api/generateForm"  # Example API for Form Generation
 
 # Function to call the FAQ API
 def call_faq_api(query):
