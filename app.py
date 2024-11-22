@@ -9,13 +9,13 @@ import uuid
 from bot import answer_customer_query, classify_and_log_query, summarize_and_log_query, sentiment_analysis
 from flask_cors import CORS
 from groq import Groq
-from chatbot.
+# from chatbot.
 
-from chatbot import (
-    LanguageModelProcessor,  # Import your LLM Processor class
-    TextToSpeech,            # Import TTS class
-    get_transcript           # Import transcription method
-)
+# from chatbot import (
+#     LanguageModelProcessor,  # Import your LLM Processor class
+#     TextToSpeech,            # Import TTS class
+#     get_transcript           # Import transcription method
+# )
 
 GROQ_API = "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"
 
@@ -123,54 +123,7 @@ def generate_form():
         return jsonify({'url': unique_url})
     except Exception as e:
         return jsonify({'error': 'Unable to generate form', 'err': str(e)}), 500
-    
-@app.route("/api/badreviews", methods=["GET"])
-def get_bad_reviews():
-    """
-    This endpoint fetches data from feedback.csv, sends it to Groq for classification,
-    and returns only the bad reviews.
-    """
-    file_path = "./data/feedback.csv"
 
-    # Check if the file exists
-    if not os.path.exists(file_path):
-        return jsonify({"error": "File feedback.csv not found"}), 404
-
-    try:
-        # Read data from the CSV file
-        reviews = []
-        with open(file_path, "r", encoding="utf-8") as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                reviews.append(row)
-
-        # Prepare data for classification
-        bad_reviews = []
-        for review in reviews:
-            query = review.get("answer", "")
-            if query:  # Ensure the review text is not empty
-                # Send query to Groq for sentiment classification
-                instruction = (
-                    "Classify this review as 'Positive', 'Neutral', or 'Negative'. "
-                    "Only respond with the classification."
-                )
-                response = client.chat.completions.create(
-                    model="llama-3.1-8b-instant",
-                    messages=[
-                        {"role": "system", "content": instruction},
-                        {"role": "user", "content": query},
-                    ],
-                )
-                classification = response.choices[0].message.content.strip()
-
-                # If classified as Negative, add to bad_reviews
-                if classification.lower() == "negative":
-                    bad_reviews.append({"review": query, "classification": classification})
-
-        return jsonify({"bad_reviews": bad_reviews}), 200
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/questions', methods=['GET'])
 def get_questions():
@@ -236,6 +189,7 @@ def get_faq():
     except Exception as e:
         print(f'Error reading FAQ data file: {e}')
         return jsonify({'error': 'Unable to load FAQ data'}), 500
+    
 
 # Save Query Data
 @app.route('/api/savequery', methods=['POST'])
